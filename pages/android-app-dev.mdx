@@ -1,2 +1,56 @@
 # [Next.jsからAndroidネイティブアプリをビルドする](https://hackmd.io/@lucasfernog/BkHI4e18j)
-## TauriをNext.jsプロジェクトに導入する
+## Dockerfileの作成
+まず、以前Next.jsによるWebアプリ開発を行うためのDocker環境を構築する際に
+利用するDockerファイルの内容を再掲する
+```Dockerfile:Dockerfile
+FROM node:18-alpine
+WORKDIR /usr/app
+```
+これは、Node.jsのバージョン18が既に入っている環境を利用し
+作業ディレクトリを`/usr/app`にすることを示している
+（[Node.js アプリケーションをDockerコンテナに取り込む方法](https://nodejs.org/ja/docs/guides/nodejs-docker-webapp)から一部参照）
+
+Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)
+を参照する。この記事におけるDockerfileの記述は以下である。
+```Dockerfile:Dockerfile
+FROM rust:latest
+
+RUN apt update -y
+RUN apt install -y curl
+RUN apt install -y gcc
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt update
+RUN apt install -y nodejs
+RUN npm install -g n
+RUN n lts
+RUN n prune
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt update
+RUN apt install -y yarn
+
+WORKDIR /var/www/ 
+RUN cargo install tauri-cli
+RUN apt install -y libdbus-1-dev
+RUN pkg-config --libs --cflags dbus-1
+RUN apt install -y software-properties-common
+RUN apt update
+RUN apt install -y libgtk-3-dev
+RUN apt install -y build-essential
+RUN apt install -y libssl-dev
+RUN apt install -y libayatana-appindicator3-dev
+RUN apt install -y librsvg2-dev
+RUN apt install -y libwebkit2gtk-4.0-dev
+# windows_host_ip を コンテナ内で Windows の ip に変更
+RUN export DISPLAY=windows_host_ip:0.0 
+RUN apt install -y mesa-utils
+RUN apt install -y libgl1-mesa-glx
+RUN export MESA_GL_VERSION_OVERRIDE=4.5
+```
+いうて難しい話でもない。
+前提としてRustの最新バージョンが入っている環境を引き出し
+aptでcurlとgccを導入。curlでnode.jsを導入、その後yarnを入れる。
+作業ディレクトリでは、tauriのcliを入れた後で、Tauriを動作させる上で必要なライブラリの導入を
+行っている。あとはwindowsのhostipをいじったり、OpenGL周りのものを入れているが今回は関係ない
+
+
