@@ -1,11 +1,7 @@
 {
-  "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
-  "about": {
-    "title": "About",
-    "type": "page"
-  },
+  "index": "WSL2にDockerを導入",
+  "another": "DockerでNext.jsによる開発環境を作る",
+  "android-app-dev": "Tauri-mobileによるAndroidアプリ開発",
   "contact": {
     "title": "Contact ↗",
     "type": "page",

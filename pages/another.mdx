@@ -1,31 +1,75 @@
-# Another Page
+import { FileTree } from 'nextra/components'
 
-```js filename="demo.js" {3} copy
-let a = 1;
-
-console.log(a);
+# [Next.js in WSL2+Docker](https://zenn.dev/ttani/articles/wsl2-docker-next-setup)
+## ディレクトリ構成
+```
+/home/[ユーザ名]/<プロジェクトディレクトリ>
 ```
 
-## Component
+このときのディレクトリ構成は以下のようになる。
 
-import { useState } from 'react'
+<FileTree>
+  <FileTree.Folder name="プロジェクトディレクトリ" defaultOpen>
+    <FileTree.File name="Dockerfile" />
+    <FileTree.File name="docker-compose.yml" />
+    <FileTree.Folder name="src">
+      <FileTree.File name="Next.jsプロジェクト" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
 
-{/* Import CSS modules */}
-import styles from '../components/counters.module.css'
+## 手順
+### プロジェクトフォルダの作成
+```bash copy
+mkdir <プロジェクトフォルダ名>
+```
+### コード格納用フォルダ
+```bash copy
+cd <プロジェクトフォルダ名>
+mkdir src
+```
 
-export const Counter = () => {
-  const [count, setCount] = useState(0);
-  return (
-    <div>
-      <button onClick={() => setCount(count + 1)} className={styles.counter}>Clicked {count} times</button>
-    </div>
-  );
-};
+### Dockerfileの作成
+```bash copy
+touch Dockerfile
+```
+これで作成した後、内容は以下を記述する
+```Dockerfile:Dockerfile copy
+FROM node:18-alpine
+WORKDIR /usr/app
+```
 
-<Counter/>
+### docker-compose.ymlの作成
+プロジェクトフォルダ直下にdocker-compose.ymlを作成
 
-## External Component
+```bash copy
+touch docker-compose.yml
+```
+これで作成した後、内容は以下を記述する
+```yml:docker-compose.yml copy
+version: '3'
 
-import Counters from '../components/counters'
+services:
+  app:
+    build: ./
+    volumes:
+      - ./src:/usr/app
+    command: sh -c "bun dev"
+    ports:
+      - "3000:3000"
+```
 
-<Counters />
+### Next.jsプロジェクトの作成
+```bash copy
+docker-compose run --rm app yarn create next-app .
+```
+
+### Dockerコンテナを起動する
+プロジェクトフォルダ直下で以下のコマンドを実行
+```bash copy
+docker-compose up -d
+```
+
+こうすると、`http://localhost:3000`にアクセスする
+`src`配下でNext.jsコードを作成して動かしてみる。
+
