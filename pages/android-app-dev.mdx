@@ -126,6 +126,9 @@ RUN mv source.properties latest/
 RUN cd ..
 RUN mkdir ~/.android # You can use another location for your SDK but I prefer using ~/.android
 RUN mv cmdline-tools ~/.android
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64 # if you are using Android Studio, the location is different, see the section above about JDK
+ENV ANDROID_HOME=$HOME/.android # if you are using Android Studio, the sdk location will be at `~/Android/Sdk`
+ENV NDK_HOME"$ANDROID_HOME/ndk/25.0.8775105
 
 WORKDIR /usr/app
 RUN apt install libwebkit2gtk-4.0-dev 
