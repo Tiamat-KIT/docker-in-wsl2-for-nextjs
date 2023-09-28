@@ -1,55 +1,189 @@
+import { FileTree } from 'nextra/components'
 import {Callout} from "nextra/components"
 
-# [WSL2とDocker環境構築](https://zenn.dev/ttani/articles/wsl2-docker-setup)
-## WSL2の環境を整えよう
-### 仮想化機構の有効化
-1. Windowsで「Windowsの機能の有効化または無効化」を開く。
-2. 「Linux用Windowsサブシステム」と「仮想マシンプラットフォーム」にチェックを入れる。
+# [Next.jsからAndroidネイティブアプリをビルドする](https://hackmd.io/@lucasfernog/BkHI4e18j)
 
-### WSLを既定バージョンとして設定
-1. WindowsのPowerShellを起動し、以下を
-
-```bash:powershell copy
-wsl --set-default-version 2
+## ディレクトリ構成
+```
+/home/[ユーザ名]/<プロジェクトディレクトリ>
 ```
 
-### Microsoft Storeから最新のUbuntuをインストール
-1. Microsoft Storeで「Ubuntu」で検索し「Ubuntu 20.04 LTS」を選択しインストール
-<Callout type="info">
-    WSL2は`\\wsl$`というディレクトリパスでアクセスすることが可能。<br />
-    なので、WSL2のディレクトリにドライブレター(Z: など)を割り当てておくと便利<br />
-    `\\wsl$`ディレクトリを開くと、インストールしたUbuntu名のディレクトリがあるため<br />
-    右クリックして、「ネットワークドライブの割り当て」から割り当てを設定
-</Callout>
+このときのディレクトリ構成は以下のようになる。
 
-2. メモリの割り当てを実施
-メモリ使用量の設定を行う。
+<FileTree>
+  <FileTree.Folder name="プロジェクトディレクトリ" defaultOpen>
+    <FileTree.File name="Dockerfile" />
+    <FileTree.File name="docker-compose.yml" />
+    <FileTree.Folder name="src">
+      <FileTree.File name="Next.jsプロジェクト" />
+    </FileTree.Folder>
+  </FileTree.Folder>
+</FileTree>
+
+## 手順
+### プロジェクトフォルダの作成
+```bash copy
+mkdir <プロジェクトフォルダ名>
+```
+### コード格納用フォルダ
+```bash copy
+cd <プロジェクトフォルダ名>
+mkdir src
+```
+
+### Dockerfileの作成
+まず、以前Next.jsによるWebアプリ開発を行うためのDocker環境を構築する際に<br/>
+利用するDockerファイルの内容を再掲
+```Dockerfile:Dockerfile
+FROM node:18-alpine
+WORKDIR /usr/app
+```
+これは、
+- Node.jsのバージョン18が既に入っている環境を利用
+- 作業ディレクトリを`/usr/app`にすることを示している
+（[Node.js アプリケーションをDockerコンテナに取り込む方法](https://nodejs.org/ja/docs/guides/nodejs-docker-webapp)から一部参照）
+
+Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)<br />
+を参照する。この記事におけるDockerfileの記述は以下である。
+```Dockerfile:Dockerfile
+FROM rust:latest
+
+RUN apt update -y
+RUN apt install -y curl
+RUN apt install -y gcc
+RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt update
+RUN apt install -y nodejs
+RUN npm install -g n
+RUN n lts
+RUN n prune
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt update
+RUN apt install -y yarn
+
+WORKDIR /var/www/ 
+RUN cargo install tauri-cli
+RUN apt install -y libdbus-1-dev
+RUN pkg-config --libs --cflags dbus-1
+RUN apt install -y software-properties-common
+RUN apt update
+RUN apt install -y libgtk-3-dev
+RUN apt install -y build-essential
+RUN apt install -y libssl-dev
+RUN apt install -y libayatana-appindicator3-dev
+RUN apt install -y librsvg2-dev
+RUN apt install -y libwebkit2gtk-4.0-dev
+# windows_host_ip を コンテナ内で Windows の ip に変更
+RUN export DISPLAY=windows_host_ip:0.0 
+RUN apt install -y mesa-utils
+RUN apt install -y libgl1-mesa-glx
+RUN export MESA_GL_VERSION_OVERRIDE=4.5
+```
+いうて難しい話でもない。
+- 前提としてRustの最新バージョンが入っている環境を引き出す。
+- aptでcurlとgccを導入。
+- curlでnode.jsを導入。
+- yarnを入れる。
+- 作業ディレクトリでは、tauriのcliを入れる
+- Tauriを動作させる上で必要なライブラリの導入
+上記の6つを行っている。<br />
+あとはwindowsのhostipをいじったり、OpenGL周りのものを入れているが今回は関係ない
+
+今回は個人的な使いやすさも考え、以下のようなDockerの構成とする。
+- Rustが既に入っているものを使う
+- Node.jsは手動で導入する
+- Bunを使う
+- WORKDIRは`/usr/app`とする
+- tauri-cliはBunから導入することとする。
+
+この内容から、以下のサイトの情報をもとに、
+- Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)
+- Qiita記事[WSL2にNode.jsとYarnを導入する](https://zenn.dev/ryuu/articles/wsl2-addyarn)
+- [Installation | Bun Docs](https://bun.sh/docs/installation)
+- [Next.js | Tauri Apps](https://tauri.app/v1/guides/getting-started/setup/next-js)
+
+この内容でDockerfileを記述する
+```Dockerfile copy
+FROM rust:latest
+
+RUN apt update
+RUN apt install -y curl
+RUN apt install -y gcc
+RUN apt install -y nodejs npm
+RUN npm install -g n
+RUN n lts
+RUN n prune
+RUN npm install -g bun
+RUN sudo apt update
+RUN apt install default-jdk
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O  
+RUN cd cmdline-tools
+RUN mkdir latest
+RUN mv bin latest/
+RUN mv lib latest/
+RUN mv NOTICE.txt latest/
+RUN mv source.properties latest/
+RUN cd ..
+RUN mkdir ~/.android # You can use another location for your SDK but I prefer using ~/.android
+RUN mv cmdline-tools ~/.android
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64 # if you are using Android Studio, the location is different, see the section above about JDK
+ENV ANDROID_HOME=$HOME/.android # if you are using Android Studio, the sdk location will be at `~/Android/Sdk`
+ENV NDK_HOME"$ANDROID_HOME/ndk/25.0.8775105
+
+WORKDIR /usr/app
+RUN apt install libwebkit2gtk-4.0-dev 
+RUN apt install build-essential 
+RUN apt install wget 
+RUN apt install file 
+RUN apt install libssl-dev 
+RUN apt install libgtk-3-dev 
+RUN apt install libayatana-appindicator3-dev 
+RUN apt install librsvg2-dev
+RUN bun create next-app .
+RUN bun add -d @tauri-apps/cli
+RUN export DISPLAY=windows_host_ip:0.0 
+# この時点でpackage.jsonのscriptsに"taruri":"tauri"を追加する
+```
+
+Docker側に勝手にやらせるのはここまで
 ```bash
-C:\Users\<ユーザ名>\.wslconfig
+bun tauri init
+bun tauri dev
+bun add @tauri-apps/api
 ```
-という位置にファイルを作成する。
-下記のようにメモリとCPUプロセッサの使用量を設定する
-```bash copy
-[wsl2]
-memory=3GB
-processors=2
-```
-## Dockerをインストール
-[Dockerをインストール](https://www.docker.com/)
-1. 「Get Started」⇒「Docker Desktop」⇒「Download for Windows」でダウンロード
-2. インストールを開始し、「Install required Windows components for WSL 2」のチェックを入れたまま「OK」で進めます。
-3. Windowsからいったんログアウトするように言われるので、いったんログアウトして再度サインインすると完了です。
+などは後から実行する。
 
-### Dockerの有効化
-Dockerデスクトップを起動し、「Start」→「Skip tuotrial」→「Settings（歯車アイコン）」と進め「Use the WSL 2 based engine」にチェックが入っていることを確認
-この設定になっていたら
-``` bash copy
-docker -v
-```
-を実行し、正常に処理され、バージョンが確認できることを確認する。
+### docker-compose.ymlの作成
+前回作成した、docker-compose.ymlと<br />
+Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)<br />
+のファイルの内容から考えて、
 
-### Dockerグループに自身のユーザを追加(権限の付与)
-Dockerグループに対して、OSを操作するユーザの権限がないと動かないので、権限を設定
-```bash copy
-sudo usermod -aG docker [ユーザ名]
+```yaml copy
+version: '3'
+
+services:
+  app:
+    container_name: "tauri-app"
+    build: ./
+    tty: true
+    volumes:
+      - ./src:/usr/app
+    
+    ports:
+      - "3000:3000"
 ```
+とするのがいい感じだろう。
+
+### Dockerコンテナを起動する
+プロジェクトフォルダ直下で以下のコマンドを実行
+```bash copy
+docker-compose up -d
+```
+
+こうすると、`http://localhost:3000`にアクセスする
+`src`配下でNext.jsコードを作成して動かしてみる。
+
+<Callout type="error" emoji="️🚫">
+  まだちゃんと試してません！<br/>
+</Callout>

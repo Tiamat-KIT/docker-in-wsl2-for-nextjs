@@ -1,0 +1,55 @@
+import {Callout} from "nextra/components"
+
+# [WSL2とDocker環境構築](https://zenn.dev/ttani/articles/wsl2-docker-setup)
+## WSL2の環境を整えよう
+### 仮想化機構の有効化
+1. Windowsで「Windowsの機能の有効化または無効化」を開く。
+2. 「Linux用Windowsサブシステム」と「仮想マシンプラットフォーム」にチェックを入れる。
+
+### WSLを既定バージョンとして設定
+1. WindowsのPowerShellを起動し、以下を
+
+```bash:powershell copy
+wsl --set-default-version 2
+```
+
+### Microsoft Storeから最新のUbuntuをインストール
+1. Microsoft Storeで「Ubuntu」で検索し「Ubuntu 20.04 LTS」を選択しインストール
+<Callout type="info">
+    WSL2は`\\wsl$`というディレクトリパスでアクセスすることが可能。<br />
+    なので、WSL2のディレクトリにドライブレター(Z: など)を割り当てておくと便利<br />
+    `\\wsl$`ディレクトリを開くと、インストールしたUbuntu名のディレクトリがあるため<br />
+    右クリックして、「ネットワークドライブの割り当て」から割り当てを設定
+</Callout>
+
+2. メモリの割り当てを実施
+メモリ使用量の設定を行う。
+```bash
+C:\Users\<ユーザ名>\.wslconfig
+```
+という位置にファイルを作成する。
+下記のようにメモリとCPUプロセッサの使用量を設定する
+```bash copy
+[wsl2]
+memory=3GB
+processors=2
+```
+## Dockerをインストール
+[Dockerをインストール](https://www.docker.com/)
+1. 「Get Started」⇒「Docker Desktop」⇒「Download for Windows」でダウンロード
+2. インストールを開始し、「Install required Windows components for WSL 2」のチェックを入れたまま「OK」で進めます。
+3. Windowsからいったんログアウトするように言われるので、いったんログアウトして再度サインインすると完了です。
+
+### Dockerの有効化
+Dockerデスクトップを起動し、「Start」→「Skip tuotrial」→「Settings（歯車アイコン）」と進め「Use the WSL 2 based engine」にチェックが入っていることを確認
+この設定になっていたら
+``` bash copy
+docker -v
+```
+を実行し、正常に処理され、バージョンが確認できることを確認する。
+
+### Dockerグループに自身のユーザを追加(権限の付与)
+Dockerグループに対して、OSを操作するユーザの権限がないと動かないので、権限を設定
+```bash copy
+sudo usermod -aG docker [ユーザ名]
+```
