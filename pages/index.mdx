@@ -45,7 +45,7 @@ WORKDIR /usr/app
 
 Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)<br />
 を参照する。この記事におけるDockerfileの記述は以下である。
-```Dockerfile:Dockerfile
+```Dockerfile
 FROM rust:latest
 
 RUN apt update -y
@@ -113,14 +113,16 @@ RUN apt install -y curl
 RUN apt-get install -y zip
 RUN apt-get install -y unzip
 RUN apt install -y gcc
-RUN apt install -y nodejs npm
+RUN apt install -y nodejs 
+RUN apt-get install -y npm 
 RUN npm install -g n
 RUN n lts
 RUN n prune
 RUN npm install -g bun
 RUN apt update
 RUN apt -y install default-jdk 
-RUN wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O  
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip 
+RUN unzip commandlinetools-linux-8512546_latest.zip
 RUN cd cmdline-tools
 RUN mkdir latest
 RUN mv bin latest/
