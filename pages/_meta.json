@@ -1,8 +1,18 @@
 {
-  "index": "WSL2にDockerを導入",
-  "another": "DockerでNext.jsによる開発環境を作る",
+  "index": {
+    "title":"WSL2にDockerを導入",
+    "display":"hidden"
+  },
+  "another": {
+    "title":"DockerでNext.jsによる開発環境を作る",
+    "display":"hidden"
+  },
   "android-app-dev": "Tauri-mobileによるAndroidアプリ開発",
-  "whats-docker": "そもそもDockerってどうやって使うもんなの",
+  "whats-docker": {
+    "title":"そもそもDockerってどうやって使うもんなの",
+    "display": "hidden" 
+  },
+  
   "contact": {
     "title": "Contact ↗",
     "type": "page",

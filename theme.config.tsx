@@ -1,8 +1,9 @@
 import React from 'react'
 import { DocsThemeConfig } from 'nextra-theme-docs'
 
+const Title = "Develop in WSL2"
 const config: DocsThemeConfig = {
-  logo: <span>My Project</span>,
+  logo: <span>{Title}</span>,
   project: {
     link: 'https://github.com/shuding/nextra-docs-template',
   },
@@ -11,8 +12,16 @@ const config: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/shuding/nextra-docs-template',
   footer: {
-    text: 'Nextra Docs Template',
+    text: 'This Document from Tiamat',
   },
+  useNextSeoProps: () => {
+    return {
+      titleTemplate: `%s | ${Title}`,
+      /* openGraph: {
+        
+      } */
+    }
+  }
 }
 
 export default config
