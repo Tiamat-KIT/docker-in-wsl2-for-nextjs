@@ -120,15 +120,6 @@ WORKDIR /usr/app
 CMD ["bash"]
 ```
 
-Docker側に勝手にやらせるのはここまで
-```bash
-bun create next-app .
-bun add -d @tauri-apps/cli@next @tauri-apps/api@next
-bun tauri init
-bun tauri dev
-```
-などは後から実行する。
-
 ### docker-compose.ymlの作成
 前回作成した、docker-compose.ymlと<br />
 Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)<br />
