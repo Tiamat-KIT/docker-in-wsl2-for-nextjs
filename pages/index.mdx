@@ -103,8 +103,8 @@ ENV RUSTUP_HOME=/root/.rustup
 ENV CARGO_HOME=/root/.cargo
 ENV PATH=$PATH:$JAVA_HOME/bin:$RUSTUP_HOME/bin:$CARGO_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$NDK_HOME
 RUN export JAVA_HOME=${JAVA_HOME}
-RUN ANDROID_HOME=${ANDROID_HOME}
-RUN NDK_HOME=${NDK_HOME}
+RUN export ANDROID_HOME=${ANDROID_HOME}
+RUN export NDK_HOME=${NDK_HOME}
 
 # イメージのデフォルトユーザーを設定
 USER root
