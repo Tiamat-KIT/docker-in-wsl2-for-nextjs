@@ -154,11 +154,11 @@ RUN curl https://bun.sh/install | bash && \
 
 # 環境変数の設定
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-ENV ANDROID_SDK_ROOT=/opt/android-sdk
-ENV ANDROID_NDK_HOME=/opt/android-ndk/android-ndk-r23
+ENV ANDROID_HOME=/opt/android-sdk
+ENV NDK_HOME=/opt/android-ndk/android-ndk-r23
 ENV RUSTUP_HOME=/root/.rustup
 ENV CARGO_HOME=/root/.cargo
-ENV PATH=$PATH:$JAVA_HOME/bin:$RUSTUP_HOME/bin:$CARGO_HOME/bin:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_NDK_HOME
+ENV PATH=$PATH:$JAVA_HOME/bin:$RUSTUP_HOME/bin:$CARGO_HOME/bin:$ANDROID_HOME/cmdline-tools/latest/bin:$NDK_HOME
 
 # イメージのデフォルトユーザーを設定
 USER root
@@ -173,10 +173,9 @@ CMD ["bash"]
 Docker側に勝手にやらせるのはここまで
 ```bash
 bun create next-app .
-bun add -d @tauri-apps/cli
+bun add -d @tauri-apps/cli@next @tauri-apps/api@next
 bun tauri init
 bun tauri dev
-bun add @tauri-apps/api
 ```
 などは後から実行する。
 
@@ -210,6 +209,51 @@ docker-compose up -d
 こうすると、`http://localhost:3000`にアクセスする
 `src`配下でNext.jsコードを作成して動かしてみる。
 
+```bash
+cd src/
+bun create next-app .
+bun add -d @tauri-apps/cli@next @tauri-apps/api@next
+bun tauri init
+cd src-tauri/
+cargo add tauri@2.0.0-alpha.0
+cargo add tauri-build@2.0.0-alpha.0 --build
+cargo install tauri-cli --version "^2.0.0-alpha"
+cargo build
+cd ..
+bun tauri dev
+```
+
+```js:next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  // https://tauri.app/v1/guides/getting-started/setup/next-js/
+  images: {
+    unoptimized: true,
+  },
+}
+
+module.exports = nextConfig
+```
+
+```json:package.json
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "export": "next export",
+  "tauri": "tauri"
+},
+```
+
+```json:src-tauri/tauri.conf.json
+{
+  "tauri": {
+    "bundle": {
+      "identifier": "com.example.tauri-mobile-nextjs",
+```
 <Callout type="info" emoji="️😊">
   動作確認しました
 </Callout>
