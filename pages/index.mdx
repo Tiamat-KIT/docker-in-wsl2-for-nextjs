@@ -34,7 +34,7 @@ mkdir src
 ### Dockerfileの作成
 まず、以前Next.jsによるWebアプリ開発を行うためのDocker環境を構築する際に<br/>
 利用するDockerファイルの内容を再掲
-```Dockerfile:Dockerfile
+```Dockerfile
 FROM node:18-alpine
 WORKDIR /usr/app
 ```
@@ -105,7 +105,7 @@ RUN export MESA_GL_VERSION_OVERRIDE=4.5
 
 この内容でDockerfileを記述する
 ```Dockerfile copy
-FROM rust:latest
+FROM ubuntu:20.04
 
 RUN apt update
 RUN apt-get update
@@ -113,6 +113,8 @@ RUN apt install -y curl
 RUN apt-get install -y zip
 RUN apt-get install -y unzip
 RUN apt install -y gcc
+RUN curl https://sh.rustup.rs -sSf | sh
+RUN source $HOME/.cargo/env
 RUN apt install -y nodejs 
 RUN apt-get install -y npm 
 RUN npm install -g n
