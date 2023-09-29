@@ -32,63 +32,6 @@ mkdir src
 ```
 
 ### Dockerfileの作成
-まず、以前Next.jsによるWebアプリ開発を行うためのDocker環境を構築する際に<br/>
-利用するDockerファイルの内容を再掲
-```Dockerfile
-FROM node:18-alpine
-WORKDIR /usr/app
-```
-これは、
-- Node.jsのバージョン18が既に入っている環境を利用
-- 作業ディレクトリを`/usr/app`にすることを示している
-（[Node.js アプリケーションをDockerコンテナに取り込む方法](https://nodejs.org/ja/docs/guides/nodejs-docker-webapp)から一部参照）
-
-Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)<br />
-を参照する。この記事におけるDockerfileの記述は以下である。
-```Dockerfile
-FROM rust:latest
-
-RUN apt update -y
-RUN apt install -y curl
-RUN apt install -y gcc
-RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt update
-RUN apt install -y nodejs
-RUN npm install -g n
-RUN n lts
-RUN n prune
-RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-RUN apt update
-RUN apt install -y yarn
-
-WORKDIR /var/www/ 
-RUN cargo install tauri-cli
-RUN apt install -y libdbus-1-dev
-RUN pkg-config --libs --cflags dbus-1
-RUN apt install -y software-properties-common
-RUN apt update
-RUN apt install -y libgtk-3-dev
-RUN apt install -y build-essential
-RUN apt install -y libssl-dev
-RUN apt install -y libayatana-appindicator3-dev
-RUN apt install -y librsvg2-dev
-RUN apt install -y libwebkit2gtk-4.0-dev
-# windows_host_ip を コンテナ内で Windows の ip に変更
-RUN export DISPLAY=windows_host_ip:0.0 
-RUN apt install -y mesa-utils
-RUN apt install -y libgl1-mesa-glx
-RUN export MESA_GL_VERSION_OVERRIDE=4.5
-```
-いうて難しい話でもない。
-- 前提としてRustの最新バージョンが入っている環境を引き出す。
-- aptでcurlとgccを導入。
-- curlでnode.jsを導入。
-- yarnを入れる。
-- 作業ディレクトリでは、tauriのcliを入れる
-- Tauriを動作させる上で必要なライブラリの導入
-上記の6つを行っている。<br />
-あとはwindowsのhostipをいじったり、OpenGL周りのものを入れているが今回は関係ない
 
 今回は個人的な使いやすさも考え、以下のようなDockerの構成とする。
 - Rustが既に入っているものを使う
@@ -104,7 +47,7 @@ RUN export MESA_GL_VERSION_OVERRIDE=4.5
 - [Next.js | Tauri Apps](https://tauri.app/v1/guides/getting-started/setup/next-js)
 
 この内容でDockerfileを記述する
-```Dockerfile copy
+```Dockerfile filename="Dockerfile" copy
 # ベースイメージを指定
 FROM ubuntu:20.04
 
@@ -184,7 +127,7 @@ bun tauri dev
 Qiita記事[Docker で Tauri の環境構築する](https://qiita.com/Ritz/items/ecb4bc2d55a0d6967e6e)<br />
 のファイルの内容から考えて、
 
-```yaml copy
+```yaml filename="docker-compose.yml" copy
 version: '3'
 
 services:
