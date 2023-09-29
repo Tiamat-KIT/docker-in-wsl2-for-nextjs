@@ -167,9 +167,7 @@ cargo install tauri-cli
 cargo tauri init
 cd src-tauri/
 cargo tauri dev
-cargo add tauri@2.0.0-alpha.4
-cargo add tauri-build@2.0.0-alpha.2 --build
-cargo install tauri-cli --version "^2.0.0-alpha"
+cargo add tauri@2.0.0-alpha.4 && cargo add tauri-build@2.0.0-alpha.2 --build && cargo install tauri-cli --version "^2.0.0-alpha"
 cargo build
 cd ..
 # bun tauri dev
