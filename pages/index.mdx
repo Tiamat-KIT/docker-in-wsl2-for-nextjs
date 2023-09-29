@@ -223,7 +223,7 @@ cd ..
 bun tauri dev
 ```
 
-```js:next.config.js
+```js filename="next.config.js" copy
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -237,7 +237,7 @@ const nextConfig = {
 module.exports = nextConfig
 ```
 
-```json:package.json
+```json filename="package.json" copy
 "scripts": {
   "dev": "next dev",
   "build": "next build",
@@ -248,7 +248,7 @@ module.exports = nextConfig
 },
 ```
 
-```json:src-tauri/tauri.conf.json
+```json filename="src-tauri/tauri.conf.json" copy
 {
   "tauri": {
     "bundle": {
