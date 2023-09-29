@@ -160,15 +160,18 @@ docker-compose up -d
 ```bash
 cd src/
 bun create next-app .
-bun add -d @tauri-apps/cli@next @tauri-apps/api@next
-bun tauri init
+# bun add -d @tauri-apps/cli@next @tauri-apps/api@next
+cargo install tauri-cli
+cargo tauri init
 cd src-tauri/
+cargo tauri dev
 cargo add tauri@2.0.0-alpha.0
 cargo add tauri-build@2.0.0-alpha.0 --build
 cargo install tauri-cli --version "^2.0.0-alpha"
 cargo build
 cd ..
-bun tauri dev
+# bun tauri dev
+bun add @tauri-apps/api@next
 ```
 
 ```js filename="next.config.js" copy
@@ -180,6 +183,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  output: "export"
 }
 
 module.exports = nextConfig
