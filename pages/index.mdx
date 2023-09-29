@@ -108,6 +108,7 @@ RUN export JAVA_HOME=${JAVA_HOME}
 RUN export ANDROID_HOME=${ANDROID_HOME}
 RUN export NDK_HOME=${NDK_HOME}
 RUN rustup update stable
+RUN rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 
 # イメージのデフォルトユーザーを設定
 USER root
