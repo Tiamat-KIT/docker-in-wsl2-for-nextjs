@@ -28,7 +28,7 @@ mkdir <プロジェクトフォルダ名>
 ### コード格納用フォルダ
 ```bash copy
 cd <プロジェクトフォルダ名>
-mkdir src
+mkdir app-code
 ```
 
 ### Dockerfileの作成
@@ -151,7 +151,8 @@ services:
 ### Dockerコンテナを起動する
 プロジェクトフォルダ直下で以下のコマンドを実行
 ```bash copy
-docker-compose up -d
+# docker-compose up -d
+docker-compose build --no-cache
 ```
 
 こうすると、`http://localhost:3000`にアクセスする
