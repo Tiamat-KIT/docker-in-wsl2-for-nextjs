@@ -164,30 +164,54 @@ docker-compose build --no-cache
 cd app-code/
 bun create next-app .
 # bun add -d @tauri-apps/cli@next @tauri-apps/api@next
-cargo install tauri-cli
+bun add -d internal-ip
+cargo install tauri-cli --version "^2.0.0-alpha"
+cargo tauri migrate
 cargo tauri init
 cd src-tauri/
 cargo tauri dev
-cargo add tauri@2.0.0-alpha.4 && cargo add tauri-build@2.0.0-alpha.2 --build && cargo install tauri-cli --version "^2.0.0-alpha"
+cargo add tauri@2.0.0-alpha.4 && cargo add tauri-build@2.0.0-alpha.2 --build
 cargo build
 cd ..
 # bun tauri dev
 bun add @tauri-apps/api@next
 ```
 
+
+```json filename="tauri.conf.json" copy
+{
+	"build": {
+		"beforeDevCommand": "npm run dev",
+		"beforeBuildCommand": "npm run build",
+		"devPath": "http://localhost:3000",
+		"distDir": "../dist"
+	}
+}
+```
 ```js filename="next.config.js" copy
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  // https://tauri.app/v1/guides/getting-started/setup/next-js/
-  images: {
-    unoptimized: true,
-  },
-  output: "export"
-}
-
-module.exports = nextConfig
+const isProd = process.env.NODE_ENV === 'production';
+module.exports = async (phase, { defaultConfig }) => {
+	let internalHost = null;
+	// In dev mode we use the internal-ip to serve the assets
+	if (!isProd) {
+		const { internalIpV4 } = await import('internal-ip');
+		internalHost = await internalIpV4();
+	}
+	const nextConfig = {
+		// Ensure Next.js uses SSG instead of SSR
+		// https://nextjs.org/docs/pages/building-your-application/deploying/static-exports
+		output: 'export',
+		// Note: This experimental feature is required to use NextJS Image in SSG mode.
+		// See https://nextjs.org/docs/messages/export-image-api for different workarounds.
+		images: {
+			unoptimized: true,
+		},
+		// Configure assetPrefix or else the server won't properly resolve your assets.
+		assetPrefix: isProd ? null : `http://${internalHost}:3000`,
+	};
+	return nextConfig;
+};
 ```
 
 ```json filename="package.json" copy
