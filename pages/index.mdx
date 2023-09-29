@@ -165,12 +165,11 @@ cd app-code/
 bun create next-app .
 # bun add -d @tauri-apps/cli@next @tauri-apps/api@next
 bun add -d internal-ip
-cargo install tauri-cli --version "^2.0.0-alpha"
+cargo install tauri-cli --version "^2.0.0-alpha" && cargo add tauri@2.0.0-alpha.4 && cargo add tauri-build@2.0.0-alpha.2 --build
 cargo tauri migrate
 cargo tauri init
 cd src-tauri/
 cargo tauri dev
-cargo add tauri@2.0.0-alpha.4 && cargo add tauri-build@2.0.0-alpha.2 --build
 cargo build
 cd ..
 # bun tauri dev
