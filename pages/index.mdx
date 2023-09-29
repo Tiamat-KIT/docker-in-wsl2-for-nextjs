@@ -152,7 +152,8 @@ services:
 ### Dockerコンテナを起動する
 プロジェクトフォルダ直下で以下のコマンドを実行
 ```bash copy
-docker-compose up -d
+# docker-compose up -d
+docker-compose build --no-cache
 ```
 
 こうすると、`http://localhost:3000`にアクセスする
