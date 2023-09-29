@@ -55,7 +55,8 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # システムパッケージのアップデート
-RUN apt-get update && \
+RUN apt update && \
+    apt-get update && \
     apt-get install -y --no-install-recommends \
     ca-certificates
 
@@ -73,13 +74,9 @@ RUN apt-get update && \
     libdbus-1-dev \
     libayatana-appindicator3-dev \
     librsvg2-dev \
-    libwebkit2gtk-4.0-dev \
+    libwebkit2gtk-4.1-dev \
     openjdk-11-jdk-headless  \
     && rm -rf /var/lib/apt/lists/*
-
-RUN wget https://gitlab.com/trivoxel-utils/deb-pacman/uploads/460d83f8711c1ab5e16065e57e7eeabc/deb-pacman-2.0-0.deb \
-    && dpkg -i deb-pacman-2.0-0.deb\
-    && pacman -S webkit2gtk-4.1 
 
 # Android SDKのインストール
 RUN mkdir -p /opt/android-sdk && \
