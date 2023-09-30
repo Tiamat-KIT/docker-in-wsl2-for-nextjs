@@ -28,10 +28,11 @@ RUN /bin/bash -c "source $HOME/.cargo/env && \
 
 # Android SDKとNDKのインストール
 # 以下のコマンドでAndroid SDKとNDKをインストールします。必要なファイルパスを設定してください。
-# RUN wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip -O sdk-tools.zip && \
-#     unzip sdk-tools.zip -d /path/to/android/sdk && \
-#     rm sdk-tools.zip
-# RUN /path/to/android/sdk/tools/bin/sdkmanager --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "ndk;23.0.7599858"
+
+RUN wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip -O sdk-tools.zip && \
+    unzip sdk-tools.zip -d /path/to/android/sdk && \
+    rm sdk-tools.zip
+RUN /path/to/android/sdk/tools/bin/sdkmanager --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "ndk;23.0.7599858"
 
 # 環境変数の設定
 ENV ANDROID_HOME=/path/to/android/sdk
