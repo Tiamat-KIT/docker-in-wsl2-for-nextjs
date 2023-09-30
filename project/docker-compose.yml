@@ -1,12 +1,16 @@
 version: '3'
-
 services:
-  app:
-    container_name: "tauri-app"
-    build: ./
-    tty: true
+  tauri-app:  # コンテナ名を"tauri-app"に変更
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
-      - ./app-code:/usr/app
-    
+      - /path/to/your/app:/app
+    environment:
+      - ANDROID_HOME=/path/to/android/sdk
+      - NDK_HOME=/path/to/android/ndk
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+      - PATH=$PATH:$HOME/.cargo/bin
     ports:
-      - "3000:3000"
+      - "3000:3000"  # ポートマッピングを追加
+    # その他の設定を追加する場合、ここに記述
